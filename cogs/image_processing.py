@@ -14,7 +14,7 @@ class ImageProcessing(commands.Cog):
             return
 
         try:
-            result_buffer = overlay_image(image_url, "img/cum.png")
+            result_buffer = overlay_image(image_url, "cum.png")
             await ctx.send(file=discord.File(result_buffer, filename="overlayed_image.png"))
         except Exception as e:
             await ctx.send(f"An error occurred while processing the image: {str(e)}")
