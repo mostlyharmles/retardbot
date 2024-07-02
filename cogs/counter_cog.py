@@ -63,7 +63,7 @@ class CounterCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id == CHANNEL_ID and message.author != self.bot.user:
-            await message.channel.send("WTF!")
+            await message.channel.send("WHAT THE FUCK NOW I HAVE TO START OVER! <:angry_emoji_with_tits:1169797872301117522>")
             self.count = 0
             self.write_data(save_count=True, save_high_score=False)
             self.counter_task.restart()
