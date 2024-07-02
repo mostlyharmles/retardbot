@@ -12,3 +12,11 @@ class TextCommands(commands.Cog):
     @commands.command()
     async def hello(self, ctx):
         await ctx.send('Hello!')
+
+    @commands.command()
+    async def source(self, ctx):
+        await ctx.send('https://github.com/mostlyharmles/retardbot')
+
+    @commands.command()
+    async def commands(self, ctx):
+        await ctx.send('!ascii, !source, !roll, !gumby, !glaze, !commands')
