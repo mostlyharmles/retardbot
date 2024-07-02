@@ -25,6 +25,8 @@ async def main():
     await bot.add_cog(ImageProcessing(bot))   
     bot.remove_command('help')  # Remove the default help command
     
+
+    await bot.load_extension('cogs.counter_cog')
     await bot.start(TOKEN)
 
 if __name__ == "__main__":
