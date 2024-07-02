@@ -9,6 +9,7 @@ class CounterCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.count = self.read_counter()
+        self.save_interval = 25
         self.counter_task.start()
 
     def cog_unload(self):
@@ -30,7 +31,8 @@ class CounterCog(commands.Cog):
         if channel:
             self.count += 1
             await channel.send(str(self.count))
-            self.write_counter()
+            if self.count % self.save_interval == 0:
+                self.write_counter()
 
     @counter_task.before_loop
     async def before_counter_task(self):
@@ -39,7 +41,7 @@ class CounterCog(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.channel.id == CHANNEL_ID and message.author != self.bot.user:
-            await message.channel.send("WHAT THE FUCKING FUCK NOW I HAVE TO START OVER :angry_emoji_with_tits:")
+            await message.channel.send("WHAT THE FUCKING FUCK NOW I HAVE TO START OVER <:angry_emoji_with_tits:1169797872301117522>")
             self.count = 0
             self.write_counter()
             self.counter_task.restart()
