@@ -2,6 +2,7 @@ import discord
 from PIL import Image
 import requests
 import io
+import os
 
 async def get_image_url(ctx):
     if ctx.message.reference:
@@ -34,3 +35,13 @@ def overlay_image(image_url, overlay_path):
     buffer.seek(0)
 
     return buffer
+
+
+async def save_attachment(attachment):
+    file_path = attachment.filename
+    await attachment.save(file_path)
+    return file_path
+
+async def cleanup_file(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)

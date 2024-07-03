@@ -22,7 +22,8 @@ async def main():
     await bot.add_cog(ImageCommands(bot))
     await bot.add_cog(TextCommands(bot))
     await bot.add_cog(MessageListener(bot))
-    await bot.add_cog(ImageProcessing(bot))   
+    await bot.add_cog(ImageProcessing(bot))
+    await bot.load_extension('cogs.video_commands')   
     bot.remove_command('help')  # Remove the default help command
     
     await bot.start(TOKEN)
