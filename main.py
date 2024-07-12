@@ -6,6 +6,7 @@ from cogs.image_commands import ImageCommands
 from cogs.text_commands import TextCommands
 from cogs.message_listener import MessageListener
 from cogs.image_processing import ImageProcessing
+from cogs.blackjack import Blackjack  # Import the Blackjack cog
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -18,15 +19,19 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
-async def main():
+async def load_extensions():
     await bot.add_cog(ImageCommands(bot))
     await bot.add_cog(TextCommands(bot))
     await bot.add_cog(MessageListener(bot))
     await bot.add_cog(ImageProcessing(bot))
-    await bot.load_extension('cogs.video_commands')   
+    await bot.add_cog(Blackjack(bot))  # Add the Blackjack cog
+    await bot.load_extension('cogs.video_commands')
     bot.remove_command('help')  # Remove the default help command
-    
-    await bot.start(TOKEN)
+
+async def main():
+    async with bot:
+        await load_extensions()
+        await bot.start(TOKEN)
 
 if __name__ == "__main__":
     import asyncio
