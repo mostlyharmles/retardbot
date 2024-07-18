@@ -6,7 +6,7 @@ from cogs.image_commands import ImageCommands
 from cogs.text_commands import TextCommands
 from cogs.message_listener import MessageListener
 from cogs.image_processing import ImageProcessing
-from cogs.blackjack import Blackjack  # Import the Blackjack cog
+from cogs.blackjack import Blackjack  
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -24,10 +24,10 @@ async def load_extensions():
     await bot.add_cog(TextCommands(bot))
     await bot.add_cog(MessageListener(bot))
     await bot.add_cog(ImageProcessing(bot))
-    await bot.add_cog(Blackjack(bot))  # Add the Blackjack cog
+    await bot.add_cog(Blackjack(bot))  
     await bot.load_extension('cogs.video_commands')
     await bot.load_extension('cogs.face_detection')
-    bot.remove_command('help')  # Remove the default help command
+    bot.remove_command('help')  
 
 async def main():
     async with bot:
