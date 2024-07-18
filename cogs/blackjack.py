@@ -209,9 +209,9 @@ class Blackjack(commands.Cog):
 
         if won:
             self.high_scores[user.id] = self.high_scores.get(user.id, 0) + 1
-            result = f'You win! Your hand: {player_hand_str} (Total: {player_value}), Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})'
+            result = f'You win! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\n this message will self destruct in 90 seconds'
         else:
-            result = f'You lose! Your hand: {player_hand_str} (Total: {player_value}), Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})'
+            result = f'You lose! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\n this message will self destruct in 90 seconds'
 
         embed = discord.Embed(title="Blackjack", description=result)
         embed.set_image(url=f'attachment://player_hand_{user.id}.png')
