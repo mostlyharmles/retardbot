@@ -26,6 +26,7 @@ async def load_extensions():
     await bot.add_cog(ImageProcessing(bot))
     await bot.add_cog(Blackjack(bot))  # Add the Blackjack cog
     await bot.load_extension('cogs.video_commands')
+    await bot.load_extension('cogs.face_detection')
     bot.remove_command('help')  # Remove the default help command
 
 async def main():

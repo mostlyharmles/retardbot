@@ -3,3 +3,5 @@ python-dotenv
 Pillow
 requests
 moviepy
+opencv-python-headless
+numpy
