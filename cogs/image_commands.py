@@ -3,7 +3,7 @@ import random
 import discord
 from discord.ext import commands
 from PIL import Image
-from config import IMAGE_DIR, MOSAIC_DIR, MOSAIC_OUTPUT
+from config import IMAGE_DIR
 
 class ImageCommands(commands.Cog):
     def __init__(self, bot):
