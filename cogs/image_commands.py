@@ -9,7 +9,7 @@ class ImageCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+'''   @commands.command()
     async def roll(self, ctx):
         await ctx.send("Creating mosaic... Please wait.")
         output_image_path = self.reassemble_image(MOSAIC_DIR, MOSAIC_OUTPUT)
@@ -21,18 +21,18 @@ class ImageCommands(commands.Cog):
             os.remove(output_image_path)
         else:
             await ctx.send("Failed to create mosaic. Please try again.")
+'''
+@commands.command(name='gumby')
+async def random_image(self, ctx):
+    images = [f for f in os.listdir(IMAGE_DIR) if f.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
+    if images:
+        random_image = random.choice(images)
+        image_path = os.path.join(IMAGE_DIR, random_image)
+        await ctx.send(file=discord.File(image_path))
+    else:
+        await ctx.send("No images found in the directory.")
 
-    @commands.command(name='gumby')
-    async def random_image(self, ctx):
-        images = [f for f in os.listdir(IMAGE_DIR) if f.endswith(('.png', '.jpg', '.jpeg', '.gif', '.webp'))]
-        if images:
-            random_image = random.choice(images)
-            image_path = os.path.join(IMAGE_DIR, random_image)
-            await ctx.send(file=discord.File(image_path))
-        else:
-            await ctx.send("No images found in the directory.")
-
-    def reassemble_image(self, grid_dir, output_image_path, grid_size=20):
+"""     def reassemble_image(self, grid_dir, output_image_path, grid_size=20):
         sections = [os.path.join(grid_dir, f) for f in os.listdir(grid_dir) if f.endswith('.png')]
         
         if len(sections) != grid_size * grid_size:
@@ -55,4 +55,4 @@ class ImageCommands(commands.Cog):
         
         new_img.save(output_image_path)
         print(f"Reassembled image saved as {output_image_path}")
-        return output_image_path
+        return output_image_path """

@@ -1,8 +1,8 @@
 import random
 
 IMAGE_DIR = 'img'
-MOSAIC_DIR = 'pieces'
-MOSAIC_OUTPUT = 'reassembled_image.png'
+""" MOSAIC_DIR = 'pieces'
+MOSAIC_OUTPUT = 'reassembled_image.png' """
 
 GUMBY_ASCII = """
             _.-,

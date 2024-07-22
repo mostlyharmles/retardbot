@@ -19,4 +19,4 @@ class TextCommands(commands.Cog):
 
     @commands.command()
     async def commands(self, ctx):
-        await ctx.send('!ascii, !source, !roll, !gumby, !glaze, !gifitize, !blackjack !whitejack, !faces, !commands')
+        await ctx.send('!ascii, !source, !gumby, !glaze, !gifitize, !blackjack(!bj) !whitejack(!wj), !faces, !commands')
