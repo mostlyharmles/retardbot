@@ -33,12 +33,21 @@ class TokenManagement(commands.Cog):
     @commands.command(name='give_all_tokens')
     @commands.has_permissions(administrator=True)
     async def give_all_tokens(self, ctx, amount: int):
-        for member in ctx.guild.members:
-            if not member.bot:
-                current_tokens = get_user_tokens(member.id)
-                new_tokens = current_tokens + amount
-                set_user_tokens(member.id, new_tokens)
-        await ctx.send(f"Given {amount} tokens to all members in the server.")
+        try:
+            member_count = 0
+            for member in ctx.guild.members:
+                if not member.bot:
+                    try:
+                        current_tokens = get_user_tokens(member.id)
+                        new_tokens = current_tokens + amount
+                        set_user_tokens(member.id, new_tokens)
+                        member_count += 1
+                    except Exception as e:
+                        await ctx.send(f"Error processing tokens for {member.name}: {str(e)}")
+            
+            await ctx.send(f"Given {amount} tokens to {member_count} members in the server.")
+        except Exception as e:
+            await ctx.send(f"An error occurred: {str(e)}")
 
 async def setup(bot):
     await bot.add_cog(TokenManagement(bot))
