@@ -10,7 +10,7 @@ class Blackjack(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.games = {}
-        self.high_scores = {}
+#        self.high_scores = {}
         self.delete_delay = 90  # 5 minutes in seconds
         self.card_images_path = 'cards/'  # Path to card images
         self.temp_path = 'temp/'  # Path to temporary files
@@ -138,7 +138,6 @@ class Blackjack(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
-        """Handle reactions for hit or stay."""
         if user.bot:
             return
 
@@ -149,25 +148,20 @@ class Blackjack(commands.Cog):
                 await self.stay(reaction.message, user, reaction.emoji)
 
     async def hit(self, message, user, emoji):
-        """Handle hit action."""
         game = self.games[user.id]
         deck = self.create_deck()
         player_hand = game['player_hand']
         player_hand.append(deck.pop())
 
-        # Update the hand image before checking for game end
         await self.show_hands(game['ctx'])
 
         if self.calculate_hand_value(player_hand) > 21:
             await self.end_game(user, won=False)
         else:
             await self.show_hands(game['ctx'])
-
-        # Remove the user's reaction
         await message.remove_reaction(emoji, user)
 
     async def stay(self, message, user, emoji):
-        """Handle stay action."""
         game = self.games[user.id]
         player_hand = game['player_hand']
         dealer_hand = game['dealer_hand']
@@ -188,7 +182,6 @@ class Blackjack(commands.Cog):
         await message.remove_reaction(emoji, user)
 
     async def end_game(self, user, won):
-        """End the game and update high scores."""
         game = self.games.pop(user.id)
         player_hand = game['player_hand']
         dealer_hand = game['dealer_hand']
@@ -208,13 +201,14 @@ class Blackjack(commands.Cog):
         dealer_hand_image.save(dealer_hand_image_path)
 
         if won:
-            self.high_scores[user.id] = self.high_scores.get(user.id, 0) + 1
-            result = f'You win! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\n this message will self destruct in 90 seconds'
+                        # self.high_scores[user.id] = self.high_scores.get(user.id, 0) + 1
+            result = f'You win! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\u200b\n\u200b\n'
         else:
-            result = f'You lose! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\n this message will self destruct in 90 seconds'
+            result = f'You lose! Your hand: {player_hand_str} (Total: {player_value}),\n Dealer\'s hand: {dealer_hand_str} (Total: {dealer_value})\u200b\n\u200b\n'
 
         embed = discord.Embed(title="Blackjack", description=result)
         embed.set_image(url=f'attachment://player_hand_{user.id}.png')
+        embed.set_footer(text='\u200b\n\u200b\nTHIS MESSAGE WILL SELF-DESTRUCT IN 90 SECONDS')
 
         files = [
             discord.File(player_hand_image_path, filename=f'player_hand_{user.id}.png'),
@@ -222,21 +216,19 @@ class Blackjack(commands.Cog):
         ]
 
         await game['message'].edit(embed=embed, attachments=files)
-        # Schedule result message deletion
         await game['message'].delete(delay=self.delete_delay)
 
-        # Clean up temporary files
         os.remove(player_hand_image_path)
         os.remove(dealer_hand_image_path)
 
-    @commands.command(name='highscores')
-    async def highscores(self, ctx):
-        """Show the high score list."""
-        high_score_list = sorted(self.high_scores.items(), key=lambda x: x[1], reverse=True)
-        high_score_str = '\n'.join([f'{self.bot.get_user(user_id)}: {score}' for user_id, score in high_score_list])
-        message = await ctx.send(f'High Scores:\n{high_score_str}')
-        # Schedule high scores message deletion
-        await message.delete(delay=self.delete_delay)
+    # @commands.command(name='highscores')
+    # async def highscores(self, ctx):
+    #     """Show the high score list."""
+    #     high_score_list = sorted(self.high_scores.items(), key=lambda x: x[1], reverse=True)
+    #     high_score_str = '\n'.join([f'{self.bot.get_user(user_id)}: {score}' for user_id, score in high_score_list])
+    #     message = await ctx.send(f'High Scores:\n{high_score_str}')
+    #     # Schedule high scores message deletion
+    #     await message.delete(delay=self.delete_delay)
 
 async def setup(bot):
     await bot.add_cog(Blackjack(bot))
