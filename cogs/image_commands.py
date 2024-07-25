@@ -18,3 +18,6 @@ class ImageCommands(commands.Cog):
             await ctx.send(file=discord.File(image_path))
         else:
             await ctx.send("No images found in the directory.")
+
+async def setup(bot):
+    await bot.add_cog(ImageCommands(bot))

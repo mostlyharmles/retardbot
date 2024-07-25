@@ -1,5 +1,6 @@
 import random
 
+DATABASE_PATH = 'bot_database.sqlite'
 IMAGE_DIR = 'img'
 GUMBY_ASCII = """
             _.-,

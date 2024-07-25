@@ -20,3 +20,6 @@ class TextCommands(commands.Cog):
     @commands.command()
     async def commands(self, ctx):
         await ctx.send('!ascii, !source, !gumby, !glaze, !gifitize, !blackjack(!bj) !whitejack(!wj), !faces, !commands')
+
+async def setup(bot):
+    await bot.add_cog(TextCommands(bot))    

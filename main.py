@@ -1,12 +1,9 @@
 import os
+import traceback
 from dotenv import load_dotenv
 import discord
 from discord.ext import commands
-from cogs.image_commands import ImageCommands
-from cogs.text_commands import TextCommands
-from cogs.message_listener import MessageListener
-from cogs.image_processing import ImageProcessing
-from cogs.blackjack import Blackjack  
+from utils.database import init_db
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -20,19 +17,43 @@ async def on_ready():
     print(f'{bot.user} has connected to Discord!')
 
 async def load_extensions():
-    await bot.add_cog(ImageCommands(bot))
-    await bot.add_cog(TextCommands(bot))
-    await bot.add_cog(MessageListener(bot))
-    await bot.add_cog(ImageProcessing(bot))
-    await bot.add_cog(Blackjack(bot))  
-    await bot.load_extension('cogs.video_commands')
-    await bot.load_extension('cogs.face_detection')
-    bot.remove_command('help')  
+    extensions = [
+        'cogs.image_commands',
+        'cogs.text_commands',
+        'cogs.message_listener',
+        'cogs.image_processing',
+        'cogs.blackjack',
+        'cogs.video_commands',
+        'cogs.face_detection',
+        'cogs.token_management'
+    ]
+    
+    for extension in extensions:
+        try:
+            await bot.load_extension(extension)
+            print(f'Loaded extension: {extension}')
+        except Exception as e:
+            print(f'Failed to load extension {extension}: {e}')
+            print(traceback.format_exc())  # This will print the full error traceback
+    
+    bot.remove_command('help')
 
 async def main():
-    async with bot:
+    try:
+        print("Initializing database...")
+        init_db()
+        print("Database initialized.")
+        
+        print("Loading extensions...")
         await load_extensions()
-        await bot.start(TOKEN)
+        print("Extensions loaded.")
+        
+        print("Starting bot...")
+        async with bot:
+            await bot.start(TOKEN)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        print(traceback.format_exc())  # This will print the full error traceback
 
 if __name__ == "__main__":
     import asyncio

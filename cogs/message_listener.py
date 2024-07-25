@@ -23,3 +23,6 @@ class MessageListener(commands.Cog):
                     response = response()
                 await message.channel.send(response)
                 break
+
+async def setup(bot):
+    await bot.add_cog(MessageListener(bot))
