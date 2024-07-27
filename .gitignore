@@ -2,7 +2,9 @@ pieces/
 img/
 cum/
 lines/
-
+cards/
+webp.py
+bot_database.sqlite
 
 counter_data.json
 # Byte-compiled / optimized / DLL files
