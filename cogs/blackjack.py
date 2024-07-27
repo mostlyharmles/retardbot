@@ -6,6 +6,7 @@ import os
 from PIL import Image
 import asyncio
 from utils.database import get_user_tokens, set_user_tokens
+from cogs.token_management import TokenManagement
 
 class Blackjack(commands.Cog):
     def __init__(self, bot):
@@ -17,6 +18,8 @@ class Blackjack(commands.Cog):
 
         if not os.path.exists(self.temp_path):
             os.makedirs(self.temp_path)
+        
+        self.token_management = None
 
     @commands.command(name='blackjack', aliases=['bj', 'whitejack', 'wj', 'BJ', 'WJ'])
     async def blackjack(self, ctx, bet: int = 1):
@@ -86,7 +89,12 @@ class Blackjack(commands.Cog):
             hand_image.paste(card_image, (i * (card_width + spacing), 0), card_image)
 
         return hand_image
-
+    
+    async def get_token_management(self):
+        if self.token_management is None:
+            self.token_management = self.bot.get_cog('TokenManagement')
+        return self.token_management
+    
     async def show_hands(self, ctx):
         game = self.games[ctx.author.id]
         player_hand = game['player_hand']
@@ -190,7 +198,12 @@ class Blackjack(commands.Cog):
             new_tokens = current_tokens + game['bet']
         else:
             new_tokens = current_tokens - game['bet']
-        set_user_tokens(user.id, new_tokens)
+        is_poor = set_user_tokens(user.id, new_tokens)
+        
+        # Update the user's role
+        token_management = await self.get_token_management()
+        if token_management:
+            await token_management.update_poor_role(game['ctx'].guild, user, is_poor)
 
         # Prepare result message and images
         player_hand_str = ' '.join([f'{value} of {suit}' for value, suit in player_hand])

@@ -6,13 +6,33 @@ from utils.database import get_user_tokens, set_user_tokens
 class TokenManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.poor_role_id = None  # Set this to your "poor" role ID
+
+    @commands.Cog.listener()
+    async def on_ready(self):
+        # Set the poor_role_id here. Replace YOUR_POOR_ROLE_ID with the actual role ID.
+        self.poor_role_id = 1266812216729014494
+
+    async def update_poor_role(self, guild, member, is_poor):
+        if self.poor_role_id is None:
+            return
+
+        poor_role = guild.get_role(self.poor_role_id)
+        if poor_role is None:
+            return
+
+        if is_poor and poor_role not in member.roles:
+            await member.add_roles(poor_role)
+        elif not is_poor and poor_role in member.roles:
+            await member.remove_roles(poor_role)
 
     @commands.command(name='give_tokens')
     @commands.has_permissions(administrator=True)
     async def give_tokens(self, ctx, member: discord.Member, amount: int):
         current_tokens = get_user_tokens(member.id)
         new_tokens = current_tokens + amount
-        set_user_tokens(member.id, new_tokens)
+        is_poor = set_user_tokens(member.id, new_tokens)
+        await self.update_poor_role(ctx.guild, member, is_poor)
         await ctx.send(f"Given {amount} tokens to {member.mention}. They now have {new_tokens} tokens.")
 
     @commands.command(name='remove_tokens')
@@ -20,7 +40,8 @@ class TokenManagement(commands.Cog):
     async def remove_tokens(self, ctx, member: discord.Member, amount: int):
         current_tokens = get_user_tokens(member.id)
         new_tokens = max(0, current_tokens - amount)
-        set_user_tokens(member.id, new_tokens)
+        is_poor = set_user_tokens(member.id, new_tokens)
+        await self.update_poor_role(ctx.guild, member, is_poor)
         await ctx.send(f"Removed {amount} tokens from {member.mention}. They now have {new_tokens} tokens.")
 
     @commands.command(name='check_tokens')
@@ -29,25 +50,50 @@ class TokenManagement(commands.Cog):
             member = ctx.author
         tokens = get_user_tokens(member.id)
         await ctx.send(f"{member.mention} has {tokens} tokens.")
-
+    
     @commands.command(name='give_all_tokens')
     @commands.has_permissions(administrator=True)
     async def give_all_tokens(self, ctx, amount: int):
         try:
-            member_count = 0
+            affected_users = 0
+            poor_role = ctx.guild.get_role(self.poor_role_id)
+
             for member in ctx.guild.members:
                 if not member.bot:
-                    try:
-                        current_tokens = get_user_tokens(member.id)
-                        new_tokens = current_tokens + amount
-                        set_user_tokens(member.id, new_tokens)
-                        member_count += 1
-                    except Exception as e:
-                        await ctx.send(f"Error processing tokens for {member.name}: {str(e)}")
-            
-            await ctx.send(f"Given {amount} tokens to {member_count} members in the server.")
+                    current_tokens = get_user_tokens(member.id)
+                    new_tokens = current_tokens + amount
+                    set_user_tokens(member.id, new_tokens)
+                    affected_users += 1
+
+                    if poor_role and poor_role in member.roles:
+                        try:
+                            await member.remove_roles(poor_role)
+                        except discord.Forbidden:
+                            pass  # Skip members we can't modify roles for
+
+            await ctx.send(f"Given {amount} tokens to all users and removed the poor role. {affected_users} users affected.")
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
+
+    @commands.command(name='reset')
+    @commands.has_permissions(administrator=True)
+    async def reset(self, ctx):
+        try:
+            from utils.database import reset_all_user_tokens
+            count = reset_all_user_tokens()
+            
+            poor_role = ctx.guild.get_role(self.poor_role_id)
+            if poor_role:
+                for member in ctx.guild.members:
+                    if not member.bot and poor_role not in member.roles:
+                        try:
+                            await member.add_roles(poor_role)
+                        except discord.Forbidden:
+                            pass  # Skip members we can't assign roles to
+            
+            await ctx.send(f"All users Gumby tokens have been reset to 0 and assigned the poor role. {count} users affected.")
+        except Exception as e:
+            await ctx.send(f"An error occurred while resetting tokens: {str(e)}")
 
 async def setup(bot):
     await bot.add_cog(TokenManagement(bot))

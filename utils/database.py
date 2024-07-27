@@ -25,3 +25,13 @@ def set_user_tokens(user_id, tokens):
               (user_id, tokens))
     conn.commit()
     conn.close()
+    return tokens == 0  # Return True if tokens are 0, False otherwise
+
+def reset_all_user_tokens():
+    conn = sqlite3.connect(DATABASE_PATH)
+    c = conn.cursor()
+    c.execute("UPDATE user_tokens SET tokens = 0")
+    affected_rows = c.rowcount
+    conn.commit()
+    conn.close()
+    return affected_rows
