@@ -2,11 +2,14 @@
 import discord
 from discord.ext import commands
 from utils.database import get_user_tokens, set_user_tokens
+from datetime import datetime, timedelta
+import asyncio
 
 class TokenManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.poor_role_id = None  # Set this to your "poor" role ID
+        self.bot.loop.create_task(self.schedule_daily_tokens())
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -25,6 +28,15 @@ class TokenManagement(commands.Cog):
             await member.add_roles(poor_role)
         elif not is_poor and poor_role in member.roles:
             await member.remove_roles(poor_role)
+
+    async def schedule_daily_tokens(self):
+        await self.bot.wait_until_ready()
+        while not self.bot.is_closed():
+            now = datetime.now()
+            midnight = now.replace(hour=0, minute=0, second=0) + timedelta(days=1)
+            wait_seconds = (midnight - now).total_seconds()
+            await asyncio.sleep(wait_seconds)
+            await self.give_daily_tokens()
 
     @commands.command(name='give_tokens')
     @commands.has_permissions(administrator=True)
@@ -94,6 +106,36 @@ class TokenManagement(commands.Cog):
             await ctx.send(f"All users Gumby tokens have been reset to 0 and assigned the poor role. {count} users affected.")
         except Exception as e:
             await ctx.send(f"An error occurred while resetting tokens: {str(e)}")
+
+    async def give_daily_tokens(self, amount: int = 100):
+        try:
+            affected_users = 0
+            for guild in self.bot.guilds:
+                for member in guild.members:
+                    if not member.bot:
+                        current_tokens = get_user_tokens(member.id)
+                        new_tokens = current_tokens + amount
+                        set_user_tokens(member.id, new_tokens)
+                        affected_users += 1
+
+                        if self.poor_role_id:
+                            poor_role = guild.get_role(self.poor_role_id)
+                            if poor_role and poor_role in member.roles:
+                                try:
+                                    await member.remove_roles(poor_role)
+                                except discord.Forbidden:
+                                    pass  # Skip members we can't modify roles for
+
+            print(f"Given {amount} welfare gumby tokens to all users. {affected_users} users affected.")
+        except Exception as e:
+            print(f"An error occurred while giving daily tokens: {str(e)}")
+
+    @commands.command(name='next_welfare')
+    async def next_welfare(self, ctx):
+        now = datetime.now()
+        midnight = now.replace(hour=0, minute=0, second=0,) + timedelta(days=1)
+        time_left = midnight - now
+        await ctx.send(f"Next welfare delivery in: {time_left}")
 
 async def setup(bot):
     await bot.add_cog(TokenManagement(bot))

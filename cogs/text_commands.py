@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from config import GUMBY_ASCII
 
@@ -19,7 +20,36 @@ class TextCommands(commands.Cog):
 
     @commands.command()
     async def commands(self, ctx):
-        await ctx.send('!ascii, !source, !gumby, !glaze, !gifitize, !blackjack(!bj) !whitejack(!wj), !faces, !commands')
+        embed = discord.Embed(
+            title="RetardBot Commands",
+            description="Here are all the available commands:",
+            color=discord.Color.purple()  # You can change this color
+        )
+
+        # General Commands
+        general_commands = "• !hello\n• !source\n• !gumby\n• !ascii"
+        embed.add_field(name="General", value=general_commands, inline=False)
+
+        # Image and Video Commands
+        media_commands = "• !glaze\n• !faces\n• !gifitize"
+        embed.add_field(name="Image & Video", value=media_commands, inline=False)
+
+        # Game Commands
+        game_commands = "• !blackjack (aliases: !bj, !whitejack, !wj)"
+        embed.add_field(name="Games", value=game_commands, inline=False)
+
+        # Token Management
+        token_commands = "• !check_tokens\n• !next_welfare"
+        embed.add_field(name="Token System", value=token_commands, inline=False)
+
+        # Admin Commands
+        admin_commands = "• !give_tokens\n• !remove_tokens\n• !give_all_tokens\n• !reset"
+        embed.add_field(name="Admin Only", value=admin_commands, inline=False)
+
+        # Set footer
+        embed.set_footer(text="im retarded")
+
+        await ctx.send(embed=embed)
 
 async def setup(bot):
     await bot.add_cog(TextCommands(bot))    

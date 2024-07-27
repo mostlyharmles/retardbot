@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 import discord
 from discord.ext import commands
 from utils.database import init_db
+import asyncio
+
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -35,11 +37,11 @@ async def load_extensions():
             print(f'Loaded extension: {extension}')
         except Exception as e:
             print(f'Failed to load extension {extension}: {e}')
-            print(traceback.format_exc())  # This will print the full error traceback
+            print(traceback.format_exc())
     
     bot.remove_command('help')
 
-async def main():
+async def setup_bot():
     try:
         print("Initializing database...")
         init_db()
@@ -49,13 +51,22 @@ async def main():
         await load_extensions()
         print("Extensions loaded.")
         
+        
+    except Exception as e:
+        print(f"An error occurred during setup: {e}")
+        print(traceback.format_exc())
+
+@bot.event
+async def setup_hook():
+    await setup_bot()
+
+async def main():
+    try:
         print("Starting bot...")
-        async with bot:
-            await bot.start(TOKEN)
+        await bot.start(TOKEN)
     except Exception as e:
         print(f"An error occurred: {e}")
-        print(traceback.format_exc())  # This will print the full error traceback
+        print(traceback.format_exc())
 
 if __name__ == "__main__":
-    import asyncio
     asyncio.run(main())
