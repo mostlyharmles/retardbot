@@ -6,6 +6,7 @@ import random
 import math
 import os
 
+
 async def get_image_url(ctx):
     if ctx.message.reference:
         referenced_message = await ctx.fetch_message(ctx.message.reference.message_id)
@@ -17,11 +18,17 @@ async def get_image_url(ctx):
                 return message.attachments[0].url
     return None
 
+
 def get_random_overlay(overlay_folder):
-    overlay_files = [f for f in os.listdir(overlay_folder) if f.endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    overlay_files = [
+        f
+        for f in os.listdir(overlay_folder)
+        if f.endswith((".png", ".jpg", ".jpeg", ".gif"))
+    ]
     if not overlay_files:
         raise ValueError(f"No image files found in {overlay_folder}")
     return os.path.join(overlay_folder, random.choice(overlay_files))
+
 
 def overlay_image(image_url, overlay_folder, min_size_ratio=0.2):
     # Download the original image
@@ -65,7 +72,7 @@ def overlay_image(image_url, overlay_folder, min_size_ratio=0.2):
     random_y = random.randint(0, max(0, max_y))
 
     # Create a new transparent image for rotated overlay
-    rotated_overlay = Image.new('RGBA', (bg_width, bg_height), (0, 0, 0, 0))
+    rotated_overlay = Image.new("RGBA", (bg_width, bg_height), (0, 0, 0, 0))
     rotated_overlay.paste(overlay_image, (random_x, random_y), overlay_image)
 
     # Combine the original image with the overlay
@@ -83,6 +90,7 @@ async def save_attachment(attachment):
     file_path = attachment.filename
     await attachment.save(file_path)
     return file_path
+
 
 async def cleanup_file(file_path):
     if os.path.exists(file_path):

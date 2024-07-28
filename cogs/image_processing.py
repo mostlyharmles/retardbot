@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from utils.image_utils import get_image_url, overlay_image
 
+
 class ImageProcessing(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -17,14 +18,19 @@ class ImageProcessing(commands.Cog):
 
         try:
             result_buffer = overlay_image(image_url, self.overlay_folder)
-            await ctx.send(file=discord.File(result_buffer, filename="overlayed_image.png"))
+            await ctx.send(
+                file=discord.File(result_buffer, filename="overlayed_image.png")
+            )
         except Exception as e:
             await ctx.send(f"An error occurred while processing the image: {str(e)}")
 
     @glaze.error
     async def glaze_error(self, ctx, error):
         if isinstance(error, commands.CommandOnCooldown):
-            await ctx.send(f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds.")
+            await ctx.send(
+                f"This command is on cooldown. Please try again in {error.retry_after:.2f} seconds."
+            )
+
 
 async def setup(bot):
     await bot.add_cog(ImageProcessing(bot))

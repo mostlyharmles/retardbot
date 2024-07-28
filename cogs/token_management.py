@@ -5,6 +5,7 @@ from utils.database import get_user_tokens, set_user_tokens
 from datetime import datetime, timedelta
 import asyncio
 
+
 class TokenManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -37,32 +38,36 @@ class TokenManagement(commands.Cog):
             await asyncio.sleep(wait_seconds)
             await self.give_daily_tokens()
 
-    @commands.command(name='give_tokens')
+    @commands.command(name="give_tokens")
     @commands.has_permissions(administrator=True)
     async def give_tokens(self, ctx, member: discord.Member, amount: int):
         current_tokens = get_user_tokens(member.id)
         new_tokens = current_tokens + amount
         is_poor = set_user_tokens(member.id, new_tokens)
         await self.update_poor_role(ctx.guild, member, is_poor)
-        await ctx.send(f"Given {amount} tokens to {member.mention}. They now have {new_tokens} tokens.")
+        await ctx.send(
+            f"Given {amount} tokens to {member.mention}. They now have {new_tokens} tokens."
+        )
 
-    @commands.command(name='remove_tokens')
+    @commands.command(name="remove_tokens")
     @commands.has_permissions(administrator=True)
     async def remove_tokens(self, ctx, member: discord.Member, amount: int):
         current_tokens = get_user_tokens(member.id)
         new_tokens = max(0, current_tokens - amount)
         is_poor = set_user_tokens(member.id, new_tokens)
         await self.update_poor_role(ctx.guild, member, is_poor)
-        await ctx.send(f"Removed {amount} tokens from {member.mention}. They now have {new_tokens} tokens.")
+        await ctx.send(
+            f"Removed {amount} tokens from {member.mention}. They now have {new_tokens} tokens."
+        )
 
-    @commands.command(name='check_tokens')
+    @commands.command(name="check_tokens")
     async def check_tokens(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
         tokens = get_user_tokens(member.id)
         await ctx.send(f"{member.mention} has {tokens} tokens.")
-    
-    @commands.command(name='give_all_tokens')
+
+    @commands.command(name="give_all_tokens")
     @commands.has_permissions(administrator=True)
     async def give_all_tokens(self, ctx, amount: int):
         try:
@@ -82,17 +87,20 @@ class TokenManagement(commands.Cog):
                         except discord.Forbidden:
                             pass  # Skip members we can't modify roles for
 
-            await ctx.send(f"Given {amount} tokens to all users and removed the poor role. {affected_users} users affected.")
+            await ctx.send(
+                f"Given {amount} tokens to all users and removed the poor role. {affected_users} users affected."
+            )
         except Exception as e:
             await ctx.send(f"An error occurred: {str(e)}")
 
-    @commands.command(name='reset')
+    @commands.command(name="reset")
     @commands.has_permissions(administrator=True)
     async def reset(self, ctx):
         try:
             from utils.database import reset_all_user_tokens
+
             count = reset_all_user_tokens()
-            
+
             poor_role = ctx.guild.get_role(self.poor_role_id)
             if poor_role:
                 for member in ctx.guild.members:
@@ -101,8 +109,10 @@ class TokenManagement(commands.Cog):
                             await member.add_roles(poor_role)
                         except discord.Forbidden:
                             pass  # Skip members we can't assign roles to
-            
-            await ctx.send(f"All users Gumby tokens have been reset to 0 and assigned the poor role. {count} users affected.")
+
+            await ctx.send(
+                f"All users Gumby tokens have been reset to 0 and assigned the poor role. {count} users affected."
+            )
         except Exception as e:
             await ctx.send(f"An error occurred while resetting tokens: {str(e)}")
 
@@ -125,16 +135,23 @@ class TokenManagement(commands.Cog):
                                 except discord.Forbidden:
                                     pass  # Skip members we can't modify roles for
 
-            print(f"Given {amount} welfare gumby tokens to all users. {affected_users} users affected.")
+            print(
+                f"Given {amount} welfare gumby tokens to all users. {affected_users} users affected."
+            )
         except Exception as e:
             print(f"An error occurred while giving daily tokens: {str(e)}")
 
-    @commands.command(name='next_welfare')
+    @commands.command(name="next_welfare")
     async def next_welfare(self, ctx):
         now = datetime.now()
-        midnight = now.replace(hour=0, minute=0, second=0,) + timedelta(days=1)
+        midnight = now.replace(
+            hour=0,
+            minute=0,
+            second=0,
+        ) + timedelta(days=1)
         time_left = midnight - now
         await ctx.send(f"Next welfare delivery in: {time_left}")
+
 
 async def setup(bot):
     await bot.add_cog(TokenManagement(bot))

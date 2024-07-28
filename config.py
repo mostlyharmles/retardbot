@@ -1,7 +1,7 @@
 import random
 
-DATABASE_PATH = 'bot_database.sqlite'
-IMAGE_DIR = 'img'
+DATABASE_PATH = "bot_database.sqlite"
+IMAGE_DIR = "img"
 GUMBY_ASCII = """
             _.-,
         __.'   |   .,
@@ -24,9 +24,9 @@ NIG  ;    |    :
     /_____|_____\\
 """
 
-KEYWORDS = ['retard', 'tard', 'retarded', 'rtard']
+KEYWORDS = ["retard", "tard", "retarded", "rtard"]
 
 SPECIFIC_KEYWORD_RESPONSES = {
-    'cringe': lambda: f'{random.randint(0, 100)}% Cringe!',
-    'based': lambda: f'{random.randint(0, 100)}% Based!',
+    "cringe": lambda: f"{random.randint(0, 100)}% Cringe!",
+    "based": lambda: f"{random.randint(0, 100)}% Based!",
 }
