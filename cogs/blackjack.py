@@ -23,6 +23,10 @@ class Blackjack(commands.Cog):
 
     @commands.command(name='blackjack', aliases=['bj', 'whitejack', 'wj', 'BJ', 'WJ'])
     async def blackjack(self, ctx, bet: int = 1):
+        if bet <= 0:
+            await ctx.send("You can't bet zero or negative tokens. Please place a positive bet.")
+            return
+
         current_tokens = get_user_tokens(ctx.author.id)
         if bet > current_tokens:
             await ctx.send("You don't have enough tokens to place this bet.")

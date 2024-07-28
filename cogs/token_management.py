@@ -8,7 +8,6 @@ import asyncio
 class TokenManagement(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.poor_role_id = None  # Set this to your "poor" role ID
         self.bot.loop.create_task(self.schedule_daily_tokens())
 
     @commands.Cog.listener()
